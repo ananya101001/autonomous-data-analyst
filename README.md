@@ -46,10 +46,12 @@ The final architecture was simplified to a robust, single-shot model to maximize
 
 ```mermaid
 graph TD
-  A[User enters task in Streamlit UI] --> B{Code Generation Agent}
-  B -->|Natural language task| C[LLM: Llama 3.1 8B]
-  C -->|Generated Python script| D[Code Executor - subprocess]
-  D -->|Creates file (e.g., CSV, PNG)| E[Display result in Streamlit UI]
-  D -->|Captures terminal output/errors| E
+  A["User enters task in Streamlit UI"] --> B{"Code Generation Agent"}
+  B --> C["LLM Llama 3.1 8B"]
+  C --> D["Code Executor subprocess"]
+  D --> E["Created files such as CSV or PNG"]
+  D --> F["Terminal output and errors"]
+  E --> G["Display result in Streamlit UI"]
+  F --> G
 
 ```
