@@ -21,7 +21,7 @@ llm = ChatGroq(
     groq_api_key=os.getenv("GROQ_API_KEY")
 )
 
-# The "GOLDEN PATH" prompt. This is the definitive final version.
+# The "EXPERT" prompt. This is the definitive final version.
 code_generation_prompt = ChatPromptTemplate.from_template(
     "You are an expert Python data scientist. Your sole task is to write a single, complete, and correct Python script to solve the user's request. "
     "The execution environment has pandas, yfinance, matplotlib, and seaborn pre-installed. "
@@ -30,29 +30,35 @@ code_generation_prompt = ChatPromptTemplate.from_template(
     "\n2. DO NOT include any explanations or comments."
     "\n3. The file path for saving MUST ALWAYS start with `outputs/`."
     "\n4. Before saving any file, you MUST include this code to ensure the 'outputs' directory exists: `import os; os.makedirs('outputs', exist_ok=True)`."
-    # V V V THIS IS THE NEW UNIFIED EXAMPLE V V V
-    "\n5. **For ANY task involving fetching stock data with yfinance, you MUST use the `yf.download()` function.** This is the most reliable method. Here is the golden path example:"
+    "\n5. **For fetching data to save in a CSV**, you MUST follow this exact code pattern:"
     "\n   ```python"
-    "\n   import os"
     "\n   import yfinance as yf"
     "\n   import pandas as pd"
-    "\n   import matplotlib.pyplot as plt"
-    "\n"
-    "\n   os.makedirs('outputs', exist_ok=True)"
-    "\n"
-    "\n   # Step 1: Fetch data using the robust yf.download method"
-    "\n   data = yf.download('AAPL', period='1mo')"
+    "\n   tickers = ['TICKER1', 'TICKER2']"
+    "\n   data = []"
+    "\n   for ticker in tickers:"
+    "\n       price = yf.Ticker(ticker).info['currentPrice']"
+    "\n       data.append({{'Ticker': ticker, 'Price': price}})"
     "\n   df = pd.DataFrame(data)"
-    "\n"
-    "\n   # Step 2: If the user wants a CSV, save the data"
-    "\n   df.to_csv('outputs/stock_data.csv')"
-    "\n"
-    "\n   # Step 3: If the user wants a plot, create and save it"
-    "\n   plt.plot(df.index, df['Close'])"
-    "\n   plt.title('Stock Price Over Time')"
-    "\n   plt.savefig('outputs/stock_plot.png')"
+    "\n   df.to_csv('outputs/filename.csv', index=False)"
     "\n   ```"
-    # ^ ^ ^ THIS IS THE NEW UNIFIED EXAMPLE ^ ^ ^
+    # V V V THIS IS THE NEW, CRITICAL EXAMPLE V V V
+    "\n6. **For creating a BAR CHART of CURRENT prices**, you MUST follow this exact code pattern:"
+    "\n   ```python"
+    "\n   import yfinance as yf"
+    "\n   import matplotlib.pyplot as plt"
+    "\n   tickers = ['TICKER1', 'TICKER2']"
+    "\n   prices = []"
+    "\n   for ticker in tickers:"
+    "\n       price = yf.Ticker(ticker).info['currentPrice']"
+    "\n       prices.append(price)"
+    "\n   plt.bar(tickers, prices)"
+    "\n   plt.title('My Chart Title')"
+    "\n   plt.xlabel('Stock Tickers')"
+    "\n   plt.ylabel('Current Price')"
+    "\n   plt.savefig('outputs/filename.png')"
+    "\n   ```"
+    # ^ ^ ^ THIS IS THE NEW, CRITICAL EXAMPLE ^ ^ ^
     "\n\nUser request: {task}"
 )
 
