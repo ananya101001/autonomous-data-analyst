@@ -22,6 +22,7 @@ llm = ChatGroq(
 )
 
 # The FINAL, CORRECTLY ESCAPED prompt.
+# The "PRODUCTION-READY" prompt. This is the final version.
 code_generation_prompt = ChatPromptTemplate.from_template(
     "You are an expert Python data scientist. Your sole task is to write a single, complete, and correct Python script to solve the user's request. "
     "The execution environment has pandas, yfinance, matplotlib, and seaborn pre-installed. "
@@ -29,7 +30,10 @@ code_generation_prompt = ChatPromptTemplate.from_template(
     "\n1. Your response MUST be ONLY the raw Python code for the task, enclosed in ```python ... ``` tags."
     "\n2. DO NOT include any explanations or comments."
     "\n3. The file path for saving MUST ALWAYS start with `outputs/`."
-    "\n4. If the user asks for current stock prices, you MUST follow this exact, simple, and reliable code pattern:"
+    # V V V THIS IS THE NEW, CRITICAL INSTRUCTION V V V
+    "\n4. Before saving any file, you MUST include this code to ensure the 'outputs' directory exists: `import os; os.makedirs('outputs', exist_ok=True)`."
+    # ^ ^ ^ THIS IS THE NEW, CRITICAL INSTRUCTION ^ ^ ^
+    "\n5. If the user asks for current stock prices, you MUST follow this exact, simple, and reliable code pattern:"
     "\n   ```python"
     "\n   import yfinance as yf"
     "\n   import pandas as pd"
@@ -37,13 +41,11 @@ code_generation_prompt = ChatPromptTemplate.from_template(
     "\n   data = []"
     "\n   for ticker in tickers:"
     "\n       price = yf.Ticker(ticker).info['currentPrice']"
-    # V V V THIS IS THE LINE WE FIXED V V V
     "\n       data.append({{'Ticker': ticker, 'Price': price}})"
-    # ^ ^ ^ THIS IS THE LINE WE FIXED ^ ^ ^
     "\n   df = pd.DataFrame(data)"
     "\n   df.to_csv('outputs/filename.csv', index=False)"
     "\n   ```"
-    "\n5. For charts, you must use `plt.savefig('outputs/filename.png')`."
+    "\n6. For charts, you must use `plt.savefig('outputs/filename.png')`."
     "\n\nUser request: {task}"
 )
 
