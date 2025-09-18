@@ -83,24 +83,25 @@ code_generation_prompt = ChatPromptTemplate.from_template(
 #         return f"Error executing code: {e}"
 
 # --- 2. NEW LOCAL CODE EXECUTOR (REPLACES DOCKER) ---
-# --- 2. NEW LOCAL CODE EXECUTOR (SIMPLIFIED FOR HOSTING) ---
+# --- 2. NEW LOCAL CODE EXECUTOR (FINAL, ROBUST VERSION) ---
 def execute_code_locally(code: str) -> str:
     """
     Executes a Python script locally using a subprocess.
-    Assumes all necessary packages are already installed in the environment.
+    This is the most robust method for handling code with special characters.
     """
-    # Sanitize backticks, but leave single quotes alone.
     code = code.replace("`", "")
     
-    # The command is now much simpler. We pass the code directly.
-    full_command = f'"{sys.executable}" -c "{code}"'
+    # Command arguments as a list
+    command = [
+        sys.executable,  # The path to the current python interpreter
+        "-c",            # Flag to execute the following string as a command
+        code             # The sanitized code script
+    ]
     
     try:
-        print("--- EXECUTOR: Running code locally via subprocess ---")
-        # Let the shell handle the full command string
+        print(f"--- EXECUTOR: Running command: {command} ---")
         result = subprocess.run(
-            full_command,
-            shell=True,
+            command,
             capture_output=True,
             text=True,
             timeout=45,
@@ -111,7 +112,7 @@ def execute_code_locally(code: str) -> str:
         if result.returncode != 0:
             output += f"\n--- ERROR ---\n{result.stderr}"
 
-        print(f"--- EXECUT-OR: Finished with output ---\n{output}")
+        print(f"--- EXECUTOR: Finished with output ---\n{output}")
         return output.strip()
     except subprocess.TimeoutExpired:
         return "Error: Code execution timed out after 45 seconds."
