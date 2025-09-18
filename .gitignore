@@ -9,8 +9,8 @@ venv/
 
 # App artifacts
 outputs/
-*.csv
-*.png
+
+
 
 # Secrets
 .env
