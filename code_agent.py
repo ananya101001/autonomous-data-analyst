@@ -86,29 +86,26 @@ code_generation_prompt = ChatPromptTemplate.from_template(
 def execute_code_locally(code: str) -> str:
     """
     Executes a Python script locally using a subprocess.
-    This is less secure than Docker but is required for hosting on platforms like Streamlit Community Cloud.
+    Assumes all necessary packages are already installed in the environment.
     """
     code = code.replace("`", "")
     
-    # Use sys.executable to ensure the subprocess uses the same Python interpreter and venv
-    full_command = f'"{sys.executable}" -m pip install -q pandas yfinance matplotlib seaborn && "{sys.executable}" -c "{code.replace("`", "").replace("'", "\\'")}"'
+    # The command is now just the python code execution part.
+    full_command = f'"{sys.executable}" -c "{code.replace("`", "").replace("'", "\\'")}"'
     
     try:
         print("--- EXECUTOR: Running code locally via subprocess ---")
-        # For Windows, shell=True is often needed. For Linux/macOS, a list of args is safer.
-        # However, shell=True is simplest for handling the '&&' operator across platforms.
         result = subprocess.run(
             full_command,
             shell=True,
             capture_output=True,
             text=True,
-            timeout=45,  # Add a 45-second timeout for safety
-            check=False # Do not raise an exception on non-zero exit codes
+            timeout=45,
+            check=False
         )
         
         output = result.stdout
         if result.returncode != 0:
-            # If the script failed, stderr will contain the error message
             output += f"\n--- ERROR ---\n{result.stderr}"
 
         print(f"--- EXECUTOR: Finished with output ---\n{output}")
