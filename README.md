@@ -55,3 +55,48 @@ graph TD
   F --> G
 
 ```
+## The Development Journey: A Lesson in Agent Reliability
+
+A key part of this project was adapting the architecture to the capabilities of the chosen LLM. The initial goal was a complex, multi-step, self-correcting agent using a LangGraph loop (`Plan -> Code -> Execute -> Debug`).
+
+While testing, it became clear that the free-tier models (like Llama 3 8B) struggled with the long-term reasoning required for multi-step debugging, often getting stuck in infinite loops. They could not reliably diagnose environmental issues (like missing libraries) or maintain context between isolated code execution steps.
+
+The final, more robust architecture pivoted to a **single-shot generation model**. This demonstrates a crucial AI engineering skill: **designing the system and prompts around the strengths and weaknesses of the chosen LLM to achieve a reliable and performant result.** The final system uses advanced prompt engineering with "Golden Path" examples to guide the LLM, dramatically increasing the success rate.
+
+## Tech Stack
+*   **Framework:** LangChain, LangGraph (for initial architecture)
+*   **UI:** Streamlit
+*   **LLM Provider:** Groq
+*   **LLM:** Llama 3.1 8B (`llama-3.1-8b-instant`)
+*   **Code Execution:** Python `subprocess` (deployed version), Docker (local development version)
+*   **Data Libraries:** `yfinance`, `pandas`, `matplotlib`
+*   **Deployment:** Streamlit Community Cloud
+
+## Setup and Local Usage
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/ananya101001/autonomous-data-analyst.git
+    cd autonomous-data-analyst
+    ```
+
+2.  **Create a virtual environment and install dependencies:**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    pip install -r requirements.txt
+    ```
+
+3.  **Set up your API keys:**
+    *   Create a file named `.env` in the root directory. This file is ignored by Git and will not be uploaded.
+    *   Add your API keys to it:
+    ```
+    GROQ_API_KEY="gsk_..."
+    TAVILY_API_KEY="tvly-..."
+    ```
+
+4.  **Run the application:**
+    ```bash
+    streamlit run app.py
+    ```
+    Your browser will open to the chat interface automatically.
