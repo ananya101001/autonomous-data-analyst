@@ -23,6 +23,7 @@ llm = ChatGroq(
 
 # The FINAL, CORRECTLY ESCAPED prompt.
 # The "PRODUCTION-READY" prompt. This is the final version.
+# The "EXPERT-LEVEL" prompt. This is the final version.
 code_generation_prompt = ChatPromptTemplate.from_template(
     "You are an expert Python data scientist. Your sole task is to write a single, complete, and correct Python script to solve the user's request. "
     "The execution environment has pandas, yfinance, matplotlib, and seaborn pre-installed. "
@@ -30,10 +31,8 @@ code_generation_prompt = ChatPromptTemplate.from_template(
     "\n1. Your response MUST be ONLY the raw Python code for the task, enclosed in ```python ... ``` tags."
     "\n2. DO NOT include any explanations or comments."
     "\n3. The file path for saving MUST ALWAYS start with `outputs/`."
-    # V V V THIS IS THE NEW, CRITICAL INSTRUCTION V V V
     "\n4. Before saving any file, you MUST include this code to ensure the 'outputs' directory exists: `import os; os.makedirs('outputs', exist_ok=True)`."
-    # ^ ^ ^ THIS IS THE NEW, CRITICAL INSTRUCTION ^ ^ ^
-    "\n5. If the user asks for current stock prices, you MUST follow this exact, simple, and reliable code pattern:"
+    "\n5. **For fetching CURRENT stock prices**, you MUST follow this exact code pattern:"
     "\n   ```python"
     "\n   import yfinance as yf"
     "\n   import pandas as pd"
@@ -45,7 +44,19 @@ code_generation_prompt = ChatPromptTemplate.from_template(
     "\n   df = pd.DataFrame(data)"
     "\n   df.to_csv('outputs/filename.csv', index=False)"
     "\n   ```"
-    "\n6. For charts, you must use `plt.savefig('outputs/filename.png')`."
+    # V V V THIS IS THE NEW, CRITICAL EXAMPLE V V V
+    "\n6. **For plotting HISTORICAL data**, you MUST follow this exact code pattern:"
+    "\n   ```python"
+    "\n   import yfinance as yf"
+    "\n   import pandas as pd"
+    "\n   import matplotlib.pyplot as plt"
+    "\n   data = yf.download('TICKER', period='30d')"
+    "\n   df = pd.DataFrame(data)"
+    "\n   plt.plot(df.index, df['Close'])"
+    "\n   plt.title('My Chart Title')"
+    "\n   plt.savefig('outputs/filename.png')"
+    "\n   ```"
+    # ^ ^ ^ THIS IS THE NEW, CRITICAL EXAMPLE ^ ^ ^
     "\n\nUser request: {task}"
 )
 
