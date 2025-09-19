@@ -7,7 +7,7 @@
 
 ---
 
-## 🚀 Live Demo
+## Live Demo
 
 **Try the live application here:** [**https://autonomous-data-analyst-bkx3vrguf5htkpqqsfx72p.streamlit.app/**](https://autonomous-data-analyst-bkx3vrguf5htkpqqsfx72p.streamlit.app/)
 
